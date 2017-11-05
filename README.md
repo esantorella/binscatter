@@ -1,5 +1,6 @@
 Inspired by Stata's binscatter, described fully by Michael Stepner at
 https://michaelstepner.com/binscatter/.
+Better description at http://esantorella.com/2017/11/03/binscatter/.
 
 Example:
 
