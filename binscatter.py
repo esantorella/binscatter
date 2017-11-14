@@ -7,21 +7,13 @@ import numpy as np
 import matplotlib
 from matplotlib import pyplot as plt
 from sklearn import linear_model
-import warnings
 from scipy import sparse as sps
 
 
-def get_binscatter_objects(y: np.ndarray, x: np.ndarray, controls, n_bins, recenter_x,
-                           recenter_y):
+def get_binscatter_objects(y, x, controls, n_bins, recenter_x, recenter_y, bins):
     """
-    Returns x_means, y_means, coefficients.
-    :param y:
-    :param x:
-    :param controls: None, numpy array, or sparse matrix
-    :param n_bins:
-    :param recenter_x:
-    :param recenter_y:
-    :return:
+    Returns mean x and mean y within each bin, and coefficients if residualizing.
+    Parameters are essentially the same as in binscatter.
     """
     # Check if data is sorted
 
@@ -54,22 +46,26 @@ def get_binscatter_objects(y: np.ndarray, x: np.ndarray, controls, n_bins, recen
     if x_data.ndim == 1:
         x_data = x_data[:, None]
     reg = linear_model.LinearRegression().fit(x_data, y_data)
-    bin_edges = np.linspace(0, len(y), n_bins + 1).astype(int)
-    assert len(bin_edges) == n_bins + 1
-    bins = [slice(bin_edges[i], bin_edges[i + 1]) for i in range(len(bin_edges) - 1)]
-    assert len(bins) == n_bins
+    if bins is None:
+        bin_edges = np.linspace(0, len(y), n_bins + 1).astype(int)
+        assert len(bin_edges) == n_bins + 1
+        bins = [slice(bin_edges[i], bin_edges[i + 1]) for i in range(len(bin_edges) - 1)]
+        assert len(bins) == n_bins
+
     x_means = [np.mean(x_data[bin_]) for bin_ in bins]
     y_means = [np.mean(y_data[bin_]) for bin_ in bins]
 
     return x_means, y_means, reg.intercept_, reg.coef_[0]
 
 
-def binscatter(self, y: np.ndarray, x: np.ndarray, controls=None, n_bins=20,
+def binscatter(self, y, x, controls=None, n_bins=20,
                line_kwargs=None, scatter_kwargs=None, recenter_x=False,
-               recenter_y=True):
+               recenter_y=True, bins=None):
     """
+    :param self: matplotlib.axes.Axes object.
+        i.e., fig, axes = plt.subplots(3)
+              axes[0].binscatter(y, x)
 
-    :param self: matplotlib.axes.Axes object
     :param y: 1d numpy array or pandas series
     :param x: 1d numpy array or Pandas Series
     :param controls: numpy array or sparse matrix
@@ -78,6 +74,7 @@ def binscatter(self, y: np.ndarray, x: np.ndarray, controls=None, n_bins=20,
     :param scatter_kwargs: dict
     :param recenter_y: If true, recenter y-tilde so its mean is the mean of y
     :param recenter_x: If true, recenter y-tilde so its mean is the mean of y
+    :param bins: Indices of each bin, if you don't like the default
     :return:
     """
     if line_kwargs is None:
@@ -93,7 +90,7 @@ def binscatter(self, y: np.ndarray, x: np.ndarray, controls=None, n_bins=20,
 
     x_means, y_means, intercept, coef = get_binscatter_objects(np.asarray(y), np.asarray(x),
                                                                controls, n_bins, recenter_x,
-                                                               recenter_y)
+                                                               recenter_y, bins)
 
     self.scatter(x_means, y_means, **scatter_kwargs)
     x_range = np.array(self.get_xlim())
@@ -124,7 +121,7 @@ def main():
     axes[0].set_ylabel('Wage')
     axes[0].set_ylabel('Tenure')
     axes[0].set_title('No controls')
-    axes[1].binscatter(data['wage'], data['tenure'], controls=data['experience'], recenter=False)
+    axes[1].binscatter(data['wage'], data['tenure'], controls=data['experience'])
     axes[1].set_xlabel('Tenure (residualized)')
     axes[1].set_ylabel('Wage (residualized, recentered)')
     axes[1].legend()
@@ -139,8 +136,8 @@ def main():
     axes[0].set_ylabel('Wage')
     axes[0].set_ylabel('Tenure')
     axes[0].set_title('No controls')
-    axes[1].binscatter(data['wage'], data['tenure'], controls=data['experience'])
-    # axes[1].set_xlabel('Tenure (residualized, recentered)')
+    axes[1].binscatter(data['wage'], data['tenure'], controls=data['experience'], recenter_y=True)
+    axes[1].set_xlabel('Tenure (residualized, recentered)')
     # axes[1].set_ylabel('Wage (residualized, recentered)')
     axes[1].legend()
     axes[1].set_title('Controlling for experience')
