@@ -1,15 +1,27 @@
-Inspired by Stata's binscatter, described fully by Michael Stepner at
-https://michaelstepner.com/binscatter/.
-Better description at http://esantorella.com/2017/11/03/binscatter/.
+`binscatter` is inspired by Stata's binscatter, described fully by Michael Stepner 
+[here](https://michaelstepner.com/binscatter/). You can use it in essentially
+the same way you use Matplotlib functions like `plot` and `scatter`.
+A more extensive description of this package is [here](http://esantorella.com/2017/11/03/binscatter/).
 
-Binscatter consists of just one file. The easiest way to use binscatter is to 
-copy the file into the directory the rest of your code is in and "import binscatter."
+## Getting started
 
-Binscatter has dependencies scipy, numpy, matplotlib, pandas, and sklearn.
+1. _Copy and paste_: Binscatter's meaningful code consists of consists of just one file. 
+You can copy `binscatter/binscatter.py` into the directory the rest of your code is in.
 
-Example:
+2. _Install via pip_: To make it easier to use `binscatter` in multiple projects and directories, 
+open a terminal and
+   - git clone https://github.com/esantorella/binscatter.git
+   - cd binscatter
+   - pip install .
+
+## Usage
 
 ```
+import binscatter
+import pandas as pd
+import numpy as np
+from matplotlib import pyplot as plt
+
 # Create fake data
 n_obs = 1000
 data = pd.DataFrame({'experience': np.random.poisson(4, n_obs) + 1})

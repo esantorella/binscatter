@@ -58,23 +58,25 @@ def get_binscatter_objects(y, x, controls, n_bins, recenter_x, recenter_y, bins)
     return x_means, y_means, reg.intercept_, reg.coef_[0]
 
 
-def binscatter(self, y, x, controls=None, n_bins=20,
+def binscatter(self, x, y, controls=None, n_bins=20,
                line_kwargs=None, scatter_kwargs=None, recenter_x=False,
                recenter_y=True, bins=None):
     """
     :param self: matplotlib.axes.Axes object.
         i.e., fig, axes = plt.subplots(3)
-              axes[0].binscatter(y, x)
+              axes[0].binscatter(x, y)
 
     :param y: 1d numpy array or pandas series
     :param x: 1d numpy array or Pandas Series
     :param controls: numpy array or sparse matrix
     :param n_bins: int, default 20
-    :param line_kwargs: dict
+    :param line_kwargs: keyword arguments passed to the line in the
     :param scatter_kwargs: dict
     :param recenter_y: If true, recenter y-tilde so its mean is the mean of y
     :param recenter_x: If true, recenter y-tilde so its mean is the mean of y
-    :param bins: Indices of each bin, if you don't like the default
+    :param bins: Indices of each bin. By default, if you leave 'bins' as None,
+        binscatter constructs equal sized bins;
+        if you don't like that, use this parameter to construct your own.
     :return:
     """
     if line_kwargs is None:
@@ -104,7 +106,7 @@ def binscatter(self, y, x, controls=None, n_bins=20,
         self.set_ylabel(y.name)
     except AttributeError:
         pass
-    return coef
+    return x_means, y_means, intercept, coef
 
 matplotlib.axes.Axes.binscatter = binscatter
 
