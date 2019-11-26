@@ -30,12 +30,12 @@ data['wage'] = data['experience'] + data['tenure'] + np.random.normal(0, 1, n_ob
 fig, axes = plt.subplots(2)
 
 # Binned scatter plot of wage vs tenure
-axes[0].binscatter(data, 'wage', 'tenure')
+axes[0].binscatter(data['wage'], data['tenure'])
 axes[0].set_ylabel('Wage')
 axes[0].set_ylabel('Tenure')
 
 # Binned scatter plot that partials out the effect of experience
-axes[1].binscatter(data, 'wage', 'tenure', controls=['experience'])
+axes[1].binscatter(data['wage'], data['tenure'], controls=data['experience'])
 axes[1].set_xlabel('Tenure (residualized)')
 axes[1].set_ylabel('Wage (residualized, recentered)')
 plt.show()
