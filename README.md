@@ -25,18 +25,19 @@ from matplotlib import pyplot as plt
 # Create fake data
 n_obs = 1000
 data = pd.DataFrame({'experience': np.random.poisson(4, n_obs) + 1})
-data['tenure'] = data['experience'] + np.random.normal(0, 1, n_obs)
-data['wage'] = data['experience'] + data['tenure'] + np.random.normal(0, 1, n_obs)
-fig, axes = plt.subplots(2)
+data['Tenure'] = data['experience'] + np.random.normal(0, 1, n_obs)
+data['Wage'] = data['experience'] + data['Tenure'] + np.random.normal(0, 1, n_obs)
+fig, axes = plt.subplots(2, sharex=True, sharey=True)
 
-# Binned scatter plot of wage vs tenure
-axes[0].binscatter(data['wage'], data['tenure'])
-axes[0].set_ylabel('Wage')
-axes[0].set_ylabel('Tenure')
+# Binned scatter plot of Wage vs Tenure
+axes[0].binscatter(data['Tenure'], data['Wage'])
 
 # Binned scatter plot that partials out the effect of experience
-axes[1].binscatter(data['wage'], data['tenure'], controls=data['experience'])
-axes[1].set_xlabel('Tenure (residualized)')
+axes[1].binscatter(data['Tenure'], data['Wage'], controls=data['experience'],
+                   recenter_x=True, recenter_y=True)
+axes[1].set_xlabel('Tenure (residualized, recentered)')
 axes[1].set_ylabel('Wage (residualized, recentered)')
+
+plt.tight_layout()
 plt.show()
 ```

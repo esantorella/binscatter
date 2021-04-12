@@ -5,7 +5,6 @@ https://michaelstepner.com/binscatter/.
 import matplotlib
 import numpy as np
 import pandas as pd
-from matplotlib import pyplot as plt
 from scipy import sparse as sps
 from sklearn import linear_model
 
@@ -128,46 +127,3 @@ def binscatter(
 
 
 matplotlib.axes.Axes.binscatter = binscatter
-
-
-def main():
-    n_obs = 1000
-    data = pd.DataFrame({"experience": np.random.poisson(4, n_obs) + 1})
-    data["tenure"] = data["experience"] + np.random.normal(0, 1, n_obs)
-    data["wage"] = data["experience"] + data["tenure"] + np.random.normal(0, 1, n_obs)
-
-    fig, axes = plt.subplots(1, 2)
-    axes[0].binscatter(data["wage"], data["tenure"])
-    axes[0].legend()
-    axes[0].set_ylabel("Wage")
-    axes[0].set_ylabel("Tenure")
-    axes[0].set_title("No controls")
-    axes[1].binscatter(data["wage"], data["tenure"], controls=data["experience"])
-    axes[1].set_xlabel("Tenure (residualized)")
-    axes[1].set_ylabel("Wage (residualized, recentered)")
-    axes[1].legend()
-    axes[1].set_title("Controlling for experience")
-    plt.savefig("test")
-    plt.close("all")
-
-    # Make y more interpretable
-    fig, axes = plt.subplots(1, 2, sharey=True)
-    axes[0].binscatter(data["wage"], data["tenure"])
-    axes[0].legend()
-    axes[0].set_ylabel("Wage")
-    axes[0].set_ylabel("Tenure")
-    axes[0].set_title("No controls")
-    axes[1].binscatter(
-        data["wage"], data["tenure"], controls=data["experience"], recenter_y=True
-    )
-    axes[1].set_xlabel("Tenure (residualized, recentered)")
-    # axes[1].set_ylabel('Wage (residualized, recentered)')
-    axes[1].legend()
-    axes[1].set_title("Controlling for experience")
-    plt.savefig("test2")
-    plt.close("all")
-    return
-
-
-if __name__ == "__main__":
-    main()
