@@ -2,12 +2,12 @@
 Inspired by Stata's binscatter, described fully by Michael Stepner at
 https://michaelstepner.com/binscatter/.
 """
-import pandas as pd
-import numpy as np
 import matplotlib
+import numpy as np
+import pandas as pd
 from matplotlib import pyplot as plt
-from sklearn import linear_model
 from scipy import sparse as sps
+from sklearn import linear_model
 
 
 def get_binscatter_objects(y, x, controls, n_bins, recenter_x, recenter_y, bins):
@@ -49,7 +49,9 @@ def get_binscatter_objects(y, x, controls, n_bins, recenter_x, recenter_y, bins)
     if bins is None:
         bin_edges = np.linspace(0, len(y), n_bins + 1).astype(int)
         assert len(bin_edges) == n_bins + 1
-        bins = [slice(bin_edges[i], bin_edges[i + 1]) for i in range(len(bin_edges) - 1)]
+        bins = [
+            slice(bin_edges[i], bin_edges[i + 1]) for i in range(len(bin_edges) - 1)
+        ]
         assert len(bins) == n_bins
 
     x_means = [np.mean(x_data[bin_]) for bin_ in bins]
@@ -58,9 +60,18 @@ def get_binscatter_objects(y, x, controls, n_bins, recenter_x, recenter_y, bins)
     return x_means, y_means, reg.intercept_, reg.coef_[0]
 
 
-def binscatter(self, x, y, controls=None, n_bins=20,
-               line_kwargs=None, scatter_kwargs=None, recenter_x=False,
-               recenter_y=True, bins=None):
+def binscatter(
+    self,
+    x,
+    y,
+    controls=None,
+    n_bins=20,
+    line_kwargs=None,
+    scatter_kwargs=None,
+    recenter_x=False,
+    recenter_y=True,
+    bins=None,
+):
     """
     :param self: matplotlib.axes.Axes object.
         i.e., fig, axes = plt.subplots(3)
@@ -84,19 +95,26 @@ def binscatter(self, x, y, controls=None, n_bins=20,
     if scatter_kwargs is None:
         scatter_kwargs = {}
     if controls is not None:
-        if isinstance(controls, pd.SparseDataFrame) or isinstance(controls, pd.SparseSeries):
+        if isinstance(controls, pd.SparseDataFrame) or isinstance(
+            controls, pd.SparseSeries
+        ):
             controls = controls.to_coo()
         elif isinstance(controls, pd.DataFrame) or isinstance(controls, pd.Series):
             controls = controls.values
         assert isinstance(controls, np.ndarray) or sps.issparse(controls)
 
-    x_means, y_means, intercept, coef = get_binscatter_objects(np.asarray(y), np.asarray(x),
-                                                               controls, n_bins, recenter_x,
-                                                               recenter_y, bins)
+    x_means, y_means, intercept, coef = get_binscatter_objects(
+        np.asarray(y), np.asarray(x), controls, n_bins, recenter_x, recenter_y, bins
+    )
 
     self.scatter(x_means, y_means, **scatter_kwargs)
     x_range = np.array(self.get_xlim())
-    self.plot(x_range, intercept + x_range * coef, label='beta=' + str(round(coef, 3)), **line_kwargs)
+    self.plot(
+        x_range,
+        intercept + x_range * coef,
+        label="beta=" + str(round(coef, 3)),
+        **line_kwargs
+    )
     # If series were passed, might be able to label
     try:
         self.set_xlabel(x.name)
@@ -108,44 +126,48 @@ def binscatter(self, x, y, controls=None, n_bins=20,
         pass
     return x_means, y_means, intercept, coef
 
+
 matplotlib.axes.Axes.binscatter = binscatter
 
 
 def main():
     n_obs = 1000
-    data = pd.DataFrame({'experience': np.random.poisson(4, n_obs) + 1})
-    data['tenure'] = data['experience'] + np.random.normal(0, 1, n_obs)
-    data['wage'] = data['experience'] + data['tenure'] + np.random.normal(0, 1, n_obs)
+    data = pd.DataFrame({"experience": np.random.poisson(4, n_obs) + 1})
+    data["tenure"] = data["experience"] + np.random.normal(0, 1, n_obs)
+    data["wage"] = data["experience"] + data["tenure"] + np.random.normal(0, 1, n_obs)
 
     fig, axes = plt.subplots(1, 2)
-    axes[0].binscatter(data['wage'], data['tenure'])
+    axes[0].binscatter(data["wage"], data["tenure"])
     axes[0].legend()
-    axes[0].set_ylabel('Wage')
-    axes[0].set_ylabel('Tenure')
-    axes[0].set_title('No controls')
-    axes[1].binscatter(data['wage'], data['tenure'], controls=data['experience'])
-    axes[1].set_xlabel('Tenure (residualized)')
-    axes[1].set_ylabel('Wage (residualized, recentered)')
+    axes[0].set_ylabel("Wage")
+    axes[0].set_ylabel("Tenure")
+    axes[0].set_title("No controls")
+    axes[1].binscatter(data["wage"], data["tenure"], controls=data["experience"])
+    axes[1].set_xlabel("Tenure (residualized)")
+    axes[1].set_ylabel("Wage (residualized, recentered)")
     axes[1].legend()
-    axes[1].set_title('Controlling for experience')
-    plt.savefig('test')
-    plt.close('all')
+    axes[1].set_title("Controlling for experience")
+    plt.savefig("test")
+    plt.close("all")
 
     # Make y more interpretable
     fig, axes = plt.subplots(1, 2, sharey=True)
-    axes[0].binscatter(data['wage'], data['tenure'])
+    axes[0].binscatter(data["wage"], data["tenure"])
     axes[0].legend()
-    axes[0].set_ylabel('Wage')
-    axes[0].set_ylabel('Tenure')
-    axes[0].set_title('No controls')
-    axes[1].binscatter(data['wage'], data['tenure'], controls=data['experience'], recenter_y=True)
-    axes[1].set_xlabel('Tenure (residualized, recentered)')
+    axes[0].set_ylabel("Wage")
+    axes[0].set_ylabel("Tenure")
+    axes[0].set_title("No controls")
+    axes[1].binscatter(
+        data["wage"], data["tenure"], controls=data["experience"], recenter_y=True
+    )
+    axes[1].set_xlabel("Tenure (residualized, recentered)")
     # axes[1].set_ylabel('Wage (residualized, recentered)')
     axes[1].legend()
-    axes[1].set_title('Controlling for experience')
-    plt.savefig('test2')
-    plt.close('all')
+    axes[1].set_title("Controlling for experience")
+    plt.savefig("test2")
+    plt.close("all")
     return
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

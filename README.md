@@ -1,14 +1,14 @@
-`binscatter` is inspired by Stata's binscatter, described fully by Michael Stepner 
+`binscatter` is inspired by Stata's binscatter, described fully by Michael Stepner
 [here](https://michaelstepner.com/binscatter/). You can use it in essentially
 the same way you use Matplotlib functions like `plot` and `scatter`.
 A more extensive description of this package is [here](http://esantorella.com/2017/11/03/binscatter/).
 
 ## Getting started
 
-1. _Copy and paste_: Binscatter's meaningful code consists of consists of just one file. 
+1. _Copy and paste_: Binscatter's meaningful code consists of consists of just one file.
 You can copy `binscatter/binscatter.py` into the directory the rest of your code is in.
 
-2. _Install via pip_: To make it easier to use `binscatter` in multiple projects and directories, 
+2. _Install via pip_: To make it easier to use `binscatter` in multiple projects and directories,
 open a terminal and
    - git clone https://github.com/esantorella/binscatter.git
    - cd binscatter

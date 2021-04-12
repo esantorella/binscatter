@@ -1,5 +1,5 @@
-pandas
-numpy
 matplotlib
-sklearn
+numpy
+pandas
 scipy
+sklearn
