@@ -1,6 +1,6 @@
 If you're looking to make a nice binned scatter plot with a regression line and you
 don't need to account for any control variables use
-[seaborn.reglplot](https://seaborn.pydata.org/generated/seaborn.regplot.html)! If you're
+[seaborn.regplot](https://seaborn.pydata.org/generated/seaborn.regplot.html)! If you're
 looking for a Python analog to Stata's
 [binscatter](https://michaelstepner.com/binscatter/), read on.
 
