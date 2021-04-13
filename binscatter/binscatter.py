@@ -2,14 +2,25 @@
 Inspired by Stata's binscatter, described fully by Michael Stepner at
 https://michaelstepner.com/binscatter/.
 """
+from typing import Dict, Iterable, List, Optional, Tuple, Union
+
 import matplotlib
 import numpy as np
+import numpy.typing as npt
 import pandas as pd
 from scipy import sparse as sps
 from sklearn import linear_model
 
 
-def get_binscatter_objects(y, x, controls, n_bins, recenter_x, recenter_y, bins):
+def get_binscatter_objects(
+    y: np.ndarray,
+    x: np.ndarray,
+    controls: Optional[np.ndarray],
+    n_bins: int,
+    recenter_x: bool,
+    recenter_y: bool,
+    bins: Optional[Iterable],
+) -> Tuple[List[float], List[float], float, float]:
     """
     Returns mean x and mean y within each bin, and coefficients if residualizing.
     Parameters are essentially the same as in binscatter.
@@ -61,24 +72,28 @@ def get_binscatter_objects(y, x, controls, n_bins, recenter_x, recenter_y, bins)
 
 def binscatter(
     self,
-    x,
-    y,
-    controls=None,
+    x: npt.ArrayLike,
+    y: npt.ArrayLike,
+    controls: Optional[
+        Union[pd.DataFrame, pd.SparseDataFrame, np.ndarray, sps.spmatrix]
+    ] = None,
     n_bins=20,
-    line_kwargs=None,
-    scatter_kwargs=None,
-    recenter_x=False,
-    recenter_y=True,
-    bins=None,
-):
+    line_kwargs: Optional[Dict] = None,
+    scatter_kwargs: Optional[Dict] = None,
+    recenter_x: bool = False,
+    recenter_y: bool = True,
+    # TODO: make 'bins' consistent with functions in other libraries, as in pd.cut
+    bins: Optional[Iterable[slice]] = None,
+) -> Tuple[List[float], List[float], float, float]:
     """
     :param self: matplotlib.axes.Axes object.
         i.e., fig, axes = plt.subplots(3)
               axes[0].binscatter(x, y)
 
-    :param y: 1d numpy array or pandas series
-    :param x: 1d numpy array or Pandas Series
-    :param controls: numpy array or sparse matrix
+    :param y: Numpy ArrayLike, such as numpy.ndarray or pandas.Series; must be 1d
+    :param x: Numpy ArrayLike, such as numpy.ndarray or pandas.Series
+    :param controls: Optional; whatever can be passed to
+        sklearn.linear_model.LinearRegression, such as Numpy array or sparse matrix
     :param n_bins: int, default 20
     :param line_kwargs: keyword arguments passed to the line in the
     :param scatter_kwargs: dict
@@ -115,14 +130,10 @@ def binscatter(
         **line_kwargs
     )
     # If series were passed, might be able to label
-    try:
+    if hasattr(x, "name"):
         self.set_xlabel(x.name)
-    except AttributeError:
-        pass
-    try:
+    if hasattr(y, "name"):
         self.set_ylabel(y.name)
-    except AttributeError:
-        pass
     return x_means, y_means, intercept, coef
 
 
