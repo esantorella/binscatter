@@ -1,21 +1,16 @@
-"""
-Inspired by Stata's binscatter, described fully by Michael Stepner at
-https://michaelstepner.com/binscatter/.
-"""
-from typing import Dict, Iterable, List, Optional, Tuple, Union
+"""Monkey-patch Matplotlib to add an 'ax.binscatter' method."""
+from typing import Dict, Iterable, List, Optional, Tuple
 
 import matplotlib
 import numpy as np
 import numpy.typing as npt
-import pandas as pd
-from scipy import sparse as sps
 from sklearn import linear_model
 
 
 def get_binscatter_objects(
     y: np.ndarray,
     x: np.ndarray,
-    controls: Optional[np.ndarray],
+    controls,
     n_bins: int,
     recenter_x: bool,
     recenter_y: bool,
@@ -36,8 +31,8 @@ def get_binscatter_objects(
         y_data = y
     else:
         # Residualize
-        if controls.ndim == 1:
-            controls = controls[:, None]
+        if np.ndim(controls) == 1:
+            controls = np.expand_dims(controls, 1)
 
         demeaning_y_reg = linear_model.LinearRegression().fit(controls, y)
         y_data = y - demeaning_y_reg.predict(controls)
@@ -74,9 +69,7 @@ def binscatter(
     self,
     x: npt.ArrayLike,
     y: npt.ArrayLike,
-    controls: Optional[
-        Union[pd.DataFrame, pd.SparseDataFrame, np.ndarray, sps.spmatrix]
-    ] = None,
+    controls=None,
     n_bins=20,
     line_kwargs: Optional[Dict] = None,
     scatter_kwargs: Optional[Dict] = None,
@@ -92,8 +85,8 @@ def binscatter(
 
     :param y: Numpy ArrayLike, such as numpy.ndarray or pandas.Series; must be 1d
     :param x: Numpy ArrayLike, such as numpy.ndarray or pandas.Series
-    :param controls: Optional; whatever can be passed to
-        sklearn.linear_model.LinearRegression, such as Numpy array or sparse matrix
+    :param controls: Optional, {array-like, sparse matrix}; whatever can be passed to
+        sklearn.linear_model.LinearRegression
     :param n_bins: int, default 20
     :param line_kwargs: keyword arguments passed to the line in the
     :param scatter_kwargs: dict
@@ -108,14 +101,6 @@ def binscatter(
         line_kwargs = {}
     if scatter_kwargs is None:
         scatter_kwargs = {}
-    if controls is not None:
-        if isinstance(controls, pd.SparseDataFrame) or isinstance(
-            controls, pd.SparseSeries
-        ):
-            controls = controls.to_coo()
-        elif isinstance(controls, pd.DataFrame) or isinstance(controls, pd.Series):
-            controls = controls.values
-        assert isinstance(controls, np.ndarray) or sps.issparse(controls)
 
     x_means, y_means, intercept, coef = get_binscatter_objects(
         np.asarray(y), np.asarray(x), controls, n_bins, recenter_x, recenter_y, bins

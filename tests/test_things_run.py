@@ -27,10 +27,11 @@ def data() -> pd.DataFrame:
     "control_convert_fn",
     [
         np.asarray,
-        lambda x: list(x.values),
+        lambda x: list(x.values[:, 0]),
         lambda x: x,
         sps.coo_matrix,
-        lambda x: x.to_sparse,
+        sps.csc_matrix,
+        sps.csr_matrix,
     ],
 )
 @pytest.mark.parametrize("bins", [None, [slice(0, 50), slice(50, 100)]])
