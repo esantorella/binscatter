@@ -1,1 +1,1 @@
-import binscatter.binscatter
+import binscatter.binscatter  # noqa: F401

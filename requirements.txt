@@ -1,5 +1,3 @@
-pandas
-numpy
 matplotlib
-sklearn
-scipy
+numpy
+scikit-learn
