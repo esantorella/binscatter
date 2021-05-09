@@ -1,6 +1,6 @@
 If you're looking to make a nice binned scatter plot with a regression line and you
 don't need to account for any control variables use
-[seaborn.reglplot](https://seaborn.pydata.org/generated/seaborn.regplot.html)! If you're
+[seaborn.regplot](https://seaborn.pydata.org/generated/seaborn.regplot.html)! If you're
 looking for a Python analog to Stata's
 [binscatter](https://michaelstepner.com/binscatter/), read on.
 
@@ -32,19 +32,24 @@ from matplotlib import pyplot as plt
 
 # Create fake data
 n_obs = 1000
-data = pd.DataFrame({'experience': np.random.poisson(4, n_obs) + 1})
-data['Tenure'] = data['experience'] + np.random.normal(0, 1, n_obs)
-data['Wage'] = data['experience'] + data['Tenure'] + np.random.normal(0, 1, n_obs)
+data = pd.DataFrame({"experience": np.random.poisson(4, n_obs) + 1})
+data["Tenure"] = data["experience"] + np.random.normal(0, 1, n_obs)
+data["Wage"] = data["experience"] + data["Tenure"] + np.random.normal(0, 1, n_obs)
 fig, axes = plt.subplots(2, sharex=True, sharey=True)
 
 # Binned scatter plot of Wage vs Tenure
-axes[0].binscatter(data['Tenure'], data['Wage'])
+axes[0].binscatter(data["Tenure"], data["Wage"])
 
 # Binned scatter plot that partials out the effect of experience
-axes[1].binscatter(data['Tenure'], data['Wage'], controls=data['experience'],
-                   recenter_x=True, recenter_y=True)
-axes[1].set_xlabel('Tenure (residualized, recentered)')
-axes[1].set_ylabel('Wage (residualized, recentered)')
+axes[1].binscatter(
+    data["Tenure"],
+    data["Wage"],
+    controls=data["experience"],
+    recenter_x=True,
+    recenter_y=True,
+)
+axes[1].set_xlabel("Tenure (residualized, recentered)")
+axes[1].set_ylabel("Wage (residualized, recentered)")
 
 plt.tight_layout()
 plt.show()

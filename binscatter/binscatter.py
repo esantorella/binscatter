@@ -7,6 +7,12 @@ import numpy.typing as npt
 from sklearn import linear_model
 
 
+def _get_bins(n_elements: int, n_bins: int) -> List[slice]:
+    bin_edges = np.linspace(0, n_elements, n_bins + 1).astype(int)
+    bins = [slice(bin_edges[i], bin_edges[i + 1]) for i in range(len(bin_edges) - 1)]
+    return bins
+
+
 def get_binscatter_objects(
     y: np.ndarray,
     x: np.ndarray,
@@ -52,12 +58,7 @@ def get_binscatter_objects(
         x_data = x_data[:, None]
     reg = linear_model.LinearRegression().fit(x_data, y_data)
     if bins is None:
-        bin_edges = np.linspace(0, len(y), n_bins + 1).astype(int)
-        assert len(bin_edges) == n_bins + 1
-        bins = [
-            slice(bin_edges[i], bin_edges[i + 1]) for i in range(len(bin_edges) - 1)
-        ]
-        assert len(bins) == n_bins
+        bins = _get_bins(len(y), n_bins)
 
     x_means = [np.mean(x_data[bin_]) for bin_ in bins]
     y_means = [np.mean(y_data[bin_]) for bin_ in bins]
