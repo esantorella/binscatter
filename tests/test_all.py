@@ -130,7 +130,8 @@ def test_fig_runs_no_controls(
     plt.close("all")
 
 
-def test_readme_example_runs() -> None:
+@pytest.mark.parametrize("fit_reg", [True, None, False])
+def test_readme_example_runs(fit_reg) -> None:
 
     # Create fake data
     n_obs = 1000
@@ -140,7 +141,7 @@ def test_readme_example_runs() -> None:
     fig, axes = plt.subplots(2, sharex=True, sharey=True)
 
     # Binned scatter plot of Wage vs Tenure
-    axes[0].binscatter(data["Tenure"], data["Wage"])
+    axes[0].binscatter(data["Tenure"], data["Wage"], fit_reg=fit_reg)
 
     # Binned scatter plot that partials out the effect of experience
     axes[1].binscatter(
@@ -149,10 +150,12 @@ def test_readme_example_runs() -> None:
         controls=data["experience"],
         recenter_x=True,
         recenter_y=True,
+        fit_reg=fit_reg,
     )
     axes[1].set_xlabel("Tenure (residualized, recentered)")
     axes[1].set_ylabel("Wage (residualized, recentered)")
 
     plt.tight_layout()
-    plt.savefig("readme_example")
+    if fit_reg:
+        plt.savefig("readme_example")
     plt.close("all")
